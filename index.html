@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Søren Pihl, Graphic Designer</title>
+    <style>
+      :root { --ink: #111; --external-link-highlight: rgb(255, 255, 255); }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; min-height: 100%; }
+      body { min-height: 100dvh; display: grid; place-items: center; background: #fff; color: var(--ink); font-family: "Times New Roman", Times, serif; font-size: 21px; line-height: 1.57; letter-spacing: 0.015em; }
+      main { width: min(480px, calc(100vw - 48px)); min-height: var(--expanded-height, 0px); }
+      p { margin: 0; }
+      #bio, #contact { margin-top: 0; text-indent: 50px; }
+      button, a { color: inherit; font: inherit; line-height: inherit; letter-spacing: inherit; word-spacing: inherit; font-kerning: inherit; vertical-align: baseline; text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: 7px; }
+      button { cursor: pointer; appearance: none; border: 0; background: transparent; padding: 0; margin: 0; text-align: inherit; }
+      a { background: var(--external-link-highlight); border: 0; padding: 0; }
+      button:focus-visible, a:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
+      @media (max-width: 700px) { body { padding: 24px 32px; font-size: 18px; letter-spacing: 0.009em; } main { width: 100%; } }
+    </style>
+  </head>
+  <body>
+    <main aria-label="Søren Pihl, graphic designer">
+      <p id="statement"></p>
+      <p id="bio" hidden></p>
+      <p id="contact" hidden></p>
+    </main>
+    <script>
+      const state = {
+        designer: false,      // "graphic designer" -> independent contact reveal
+        base: false,          // "Søren Pihl" -> "Copenhagen-based" (1st click) / bio paragraph (2nd click)
+        bio: false,           // "Søren Pihl" (2nd click) -> bio paragraph reveal
+        location: false,      // "Copenhagen-based" -> second sentence
+        approach: false,      // "approach" -> ", where continuous experimentation..."
+        method: false,        // "method" -> "and keystone"
+        projects: false,      // "projects" -> "Typography..." sentence
+        typography: false,    // "Typography" -> "Seeing it is an investigative tool..."
+        ellipsis: false,      // "..." -> "which shifts and adapts..."
+        degree: false,        // "Master's degree" -> "in Graphic Communication Design"
+        academy: false,       // "Royal Danish Academy" -> ", alongside working as..."
+        inhouse: false,       // "in-house" -> "for the design company Mazō"
+        previously: false,    // "Currently" -> "Previously, he completed an internship at eTypes."
+        etypes: false         // "eTypes" -> ", and worked for the newspaper Berlingske..."
+      };
+      const statement = document.querySelector('#statement');
+      const bio = document.querySelector('#bio');
+      const contact = document.querySelector('#contact');
+      const portfolioUrl = 'https://www.figma.com/deck/IAh7gjaDRHQrxpxvHFBI7V/S%C3%B8ren-Pihl--Selected-Work-2025%E2%80%932026?node-id=94-78';
+
+      function words(target, text) { target.append(document.createTextNode(text)); }
+      function expand(label, key, onClick) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = label;
+        button.addEventListener('click', () => {
+          if (onClick) onClick();
+          else state[key] = true;
+          render();
+        });
+        return button;
+      }
+      function link(label, href) {
+        const anchor = document.createElement('a');
+        anchor.textContent = label;
+        anchor.href = href;
+        if (href.startsWith('http')) { anchor.target = '_blank'; anchor.rel = 'noopener noreferrer'; }
+        return anchor;
+      }
+      function renderStatement() {
+        const view = document.createDocumentFragment();
+
+        // --- Sentence 1: "Søren Pihl is a [Copenhagen-based] graphic designer." ---
+        // "Søren Pihl" is sequential: 1st click reveals the statement, 2nd click the bio paragraph.
+        if (state.bio) words(view, 'Søren Pihl');
+        else view.append(expand('Søren Pihl', null, () => { if (state.base) state.bio = true; else state.base = true; }));
+
+        words(view, ' is a ');
+        if (state.location) words(view, 'Copenhagen-based ');
+        else if (state.base) view.append(expand('Copenhagen-based', 'location'));
+        if (state.base || state.location) words(view, ' ');
+
+        // Independent trigger: always clickable until it reveals the contact text.
+        if (state.designer) words(view, 'graphic designer.');
+        else view.append(expand('graphic designer', 'designer'));
+        if (!state.designer) words(view, '.');
+
+        // --- Sentence 2: only once "Copenhagen-based" has been clicked. ---
+        if (state.location) {
+          words(view, ' He is driven by a non-dogmatic ');
+          if (state.approach) words(view, 'approach');
+          else view.append(expand('approach', 'approach'));
+          words(view, ' to design');
+
+          if (state.approach) {
+            // design. -> design, where continuous experimentation...
+            words(view, ', where continuous experimentation serves as the guiding ');
+            if (state.method) words(view, 'method');
+            else view.append(expand('method', 'method'));
+            words(view, ' ');
+            if (state.method) words(view, 'and keystone ');
+            words(view, 'of ');
+            if (state.projects) words(view, 'projects.');
+            else view.append(expand('projects', 'projects'));
+            if (!state.projects) words(view, '.');
+          } else {
+            words(view, '.');
+          }
+        }
+
+        // --- Sentence 3: only once "projects" has been clicked. ---
+        if (state.projects) {
+          words(view, ' ');
+          if (state.typography) words(view, 'Typography');
+          else view.append(expand('Typography', 'typography'));
+          words(view, ' plays a central part in his practice');
+
+          if (state.typography) {
+            words(view, '. Seeing it is an investigative tool for exploring form');
+            if (state.ellipsis) words(view, ', which shifts and adapts in response to each concept.');
+            else view.append(expand('...', 'ellipsis'));
+          } else {
+            words(view, '.');
+          }
+        }
+
+        statement.replaceChildren(view);
+      }
+      function renderBio() {
+        bio.hidden = !state.bio;
+        if (!state.bio) { bio.replaceChildren(); return; }
+        const view = document.createDocumentFragment();
+
+        // --- Sentence 1: "Currently, he is studying a Master's degree at the Royal Danish Academy." ---
+        // "Currently" stays active at every stage of this sentence.
+        if (state.previously) words(view, 'Currently');
+        else view.append(expand('Currently', 'previously'));
+
+        words(view, ', he is studying a ');
+        if (state.degree) words(view, 'Master\u2019s degree');
+        else view.append(expand('Master\u2019s degree', 'degree'));
+        if (state.degree) words(view, ' in Graphic Communication Design');
+
+        words(view, ' at the ');
+        if (state.academy) words(view, 'Royal Danish Academy');
+        else view.append(expand('Royal Danish Academy', 'academy'));
+
+        if (state.academy) {
+          words(view, ', alongside working as an ');
+          if (state.inhouse) words(view, 'in-house');
+          else view.append(expand('in-house', 'inhouse'));
+          words(view, ' graphic designer for ');
+          if (state.inhouse) words(view, 'the design company ');
+          words(view, 'Maz\u014D.');
+        } else {
+          words(view, '.');
+        }
+
+        // --- Sentence 2: "Previously, he completed an internship at eTypes." ---
+        // Appended after the final period of sentence 1, never replacing it.
+        if (state.previously) {
+          words(view, ' Previously, he completed an internship at ');
+          if (state.etypes) words(view, 'eTypes');
+          else view.append(expand('eTypes', 'etypes'));
+          if (state.etypes) words(view, ', and worked for the newspaper Berlingske as a junior layout designer.');
+          else words(view, '.');
+        }
+
+        bio.replaceChildren(view);
+      }
+      function renderContact() {
+        contact.hidden = !state.designer;
+        if (!state.designer) { contact.replaceChildren(); return; }
+        const view = document.createDocumentFragment();
+        words(view, 'See an extended ');
+        view.append(link('portfolio', portfolioUrl));
+        words(view, ' of his work, or reach out to him at ');
+        words(view, '0045 6075 1314');
+        words(view, ', ');
+        view.append(link('Instagram', 'https://www.instagram.com/soren_pihl/'));
+        words(view, ' or ');
+        view.append(link('Mail', 'mailto:sorenpihl@gmail.com'));
+        contact.replaceChildren(view);
+      }
+      function measureExpandedHeight() {
+        // Render the complete version only long enough to make an inert copy. The
+        // copy has the same width and typography as the live block, so its height
+        // follows wrapping, viewport changes, and font metrics naturally.
+        const savedState = { ...state };
+        Object.keys(state).forEach(key => { state[key] = true; });
+        renderStatement();
+        renderBio();
+        renderContact();
+
+        const measurement = document.createElement('main');
+        measurement.setAttribute('aria-hidden', 'true');
+        measurement.append(...Array.from(document.querySelector('main').childNodes, node => node.cloneNode(true)));
+        Object.assign(measurement.style, {
+          position: 'absolute', visibility: 'hidden', pointerEvents: 'none',
+          width: `${statement.getBoundingClientRect().width}px`, minHeight: '0', height: 'auto'
+        });
+        document.body.append(measurement);
+        const height = measurement.getBoundingClientRect().height;
+        measurement.remove();
+
+        Object.assign(state, savedState);
+        renderStatement();
+        renderBio();
+        renderContact();
+        document.querySelector('main').style.setProperty('--expanded-height', `${height}px`);
+      }
+
+      function render() {
+        renderStatement();
+        renderBio();
+        renderContact();
+        measureExpandedHeight();
+      }
+      window.addEventListener('resize', measureExpandedHeight);
+      document.fonts?.ready.then(measureExpandedHeight);
+      render();
+    </script>
+  </body>
+</html>
