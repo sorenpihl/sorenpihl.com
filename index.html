@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Søren Pihl, Graphic Designer</title>
     <style>
+      @font-face { font-family: "Cambria Math"; src: url("Cambria Math.ttf") format("truetype"); font-display: swap; }
       :root { --ink: #111; --external-link-highlight: rgb(255, 255, 255); }
       * { box-sizing: border-box; }
       html, body { margin: 0; min-height: 100%; }
@@ -12,11 +13,12 @@
       main { width: min(480px, calc(100vw - 48px)); min-height: var(--expanded-height, 0px); }
       p { margin: 0; }
       #bio, #contact { margin-top: 0; text-indent: 50px; }
-      button, a { color: inherit; font: inherit; line-height: inherit; letter-spacing: inherit; word-spacing: inherit; font-kerning: inherit; vertical-align: baseline; text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: 7px; }
-      button { cursor: pointer; appearance: none; border: 0; background: transparent; padding: 0; margin: 0; text-align: inherit; }
-      a { background: var(--external-link-highlight); border: 0; padding: 0; }
-      button:focus-visible, a:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
-      @media (max-width: 700px) { body { padding: 24px 32px; font-size: 18px; letter-spacing: 0.009em; } main { width: 100%; } }
+      .trigger, a { color: inherit; font: inherit; line-height: inherit; letter-spacing: inherit; word-spacing: inherit; font-kerning: inherit; vertical-align: baseline; text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: 7px; }
+      .trigger { cursor: pointer; }
+      a { color: #1500ff; background: var(--external-link-highlight); border: 0; padding: 0; text-decoration: none; }
+      .mobile-only { display: none; }
+      .trigger:focus-visible, a:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
+      @media (max-width: 700px) { body { padding: 24px 32px; font-size: 18px; letter-spacing: 0.009em; } main { width: 100%; } #statement, #bio, #contact { text-indent: 30px; } .desktop-only { display: none; } .mobile-only { display: inline; } }
     </style>
   </head>
   <body>
@@ -49,19 +51,31 @@
 
       function words(target, text) { target.append(document.createTextNode(text)); }
       function expand(label, key, onClick) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.textContent = label;
-        button.addEventListener('click', () => {
+        const trigger = document.createElement('span');
+        trigger.className = 'trigger';
+        trigger.setAttribute('role', 'button');
+        trigger.tabIndex = 0;
+        trigger.textContent = label;
+        const activate = () => {
           if (onClick) onClick();
           else state[key] = true;
           render();
+        };
+        trigger.addEventListener('click', activate);
+        trigger.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            activate();
+          }
         });
-        return button;
+        return trigger;
       }
       function link(label, href) {
         const anchor = document.createElement('a');
-        anchor.textContent = label;
+        const linkLabel = document.createElement('span');
+        linkLabel.className = 'external-link-label';
+        linkLabel.textContent = label;
+        anchor.append(linkLabel);
         anchor.href = href;
         if (href.startsWith('http')) { anchor.target = '_blank'; anchor.rel = 'noopener noreferrer'; }
         return anchor;
@@ -116,7 +130,7 @@
 
           if (state.typography) {
             words(view, '. Seeing it is an investigative tool for exploring form');
-            if (state.ellipsis) words(view, ', which shifts and adapts in response to each concept.');
+            if (state.ellipsis) words(view, ', which shifts and adapts in response to each concept and projects.');
             else view.append(expand('...', 'ellipsis'));
           } else {
             words(view, '.');
@@ -137,7 +151,18 @@
 
         words(view, ', he is studying a ');
         if (state.degree) words(view, 'Master\u2019s degree');
-        else view.append(expand('Master\u2019s degree', 'degree'));
+        else {
+          const desktopDegree = expand('Master\u2019s degree', 'degree');
+          desktopDegree.classList.add('desktop-only');
+          view.append(desktopDegree);
+          const mobileDegree = expand('Master\u2019s', 'degree');
+          mobileDegree.classList.add('mobile-only');
+          view.append(mobileDegree);
+          const mobileSuffix = document.createElement('span');
+          mobileSuffix.className = 'mobile-only';
+          mobileSuffix.textContent = ' degree';
+          view.append(mobileSuffix);
+        }
         if (state.degree) words(view, ' in Graphic Communication Design');
 
         words(view, ' at the ');
@@ -172,10 +197,8 @@
         if (!state.designer) { contact.replaceChildren(); return; }
         const view = document.createDocumentFragment();
         words(view, 'See an extended ');
-        view.append(link('portfolio', portfolioUrl));
-        words(view, ' of his work, or reach out to him at ');
-        words(view, '0045 6075 1314');
-        words(view, ', ');
+        view.append(link('Portfolio', portfolioUrl));
+        words(view, ' of his work, or reach out to him on ');
         view.append(link('Instagram', 'https://www.instagram.com/soren_pihl/'));
         words(view, ' or ');
         view.append(link('Mail', 'mailto:sorenpihl@gmail.com'));
