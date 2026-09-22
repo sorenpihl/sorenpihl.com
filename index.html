@@ -3,22 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://use.typekit.net/lrk6pfd.css" />
     <title>Søren Pihl, Graphic Designer</title>
     <style>
       @font-face { font-family: "Cambria Math"; src: url("Cambria Math.ttf") format("truetype"); font-display: swap; }
       :root { --ink: #111; --external-link-highlight: rgb(255, 255, 255); }
       * { box-sizing: border-box; }
       html, body { margin: 0; min-height: 100%; }
-      body { min-height: 100dvh; display: grid; place-items: center; background: #fff; color: var(--ink); font-family: "Times New Roman", Times, serif; font-size: 21px; line-height: 1.57; letter-spacing: 0.015em; }
-      main { width: min(480px, calc(100vw - 48px)); min-height: var(--expanded-height, 0px); }
+      body { min-height: 100dvh; display: grid; place-items: center; background: #fff; color: var(--ink); font-family: "minion-pro", serif; font-weight: 400; font-style: normal; font-size: 21px; line-height: 1.57; letter-spacing: 0.015em; }
+      main { width: min(529px, calc(100vw - 48px)); min-height: var(--expanded-height, 0px); }
       p { margin: 0; }
-      #bio, #contact { margin-top: 0; text-indent: 50px; }
+      #statement, #bio, #contact { margin-top: 0; text-indent: 50px; }
       .trigger, a { color: inherit; font: inherit; line-height: inherit; letter-spacing: inherit; word-spacing: inherit; font-kerning: inherit; vertical-align: baseline; text-decoration-line: underline; text-decoration-thickness: 1px; text-underline-offset: 7px; }
       .trigger { cursor: pointer; }
       a { color: #1500ff; background: var(--external-link-highlight); border: 0; padding: 0; text-decoration: none; }
       .mobile-only { display: none; }
       .trigger:focus-visible, a:focus-visible { outline: 1px solid currentColor; outline-offset: 2px; }
-      @media (max-width: 700px) { body { padding: 24px 32px; font-size: 18px; letter-spacing: 0.009em; } main { width: 100%; } #statement, #bio, #contact { text-indent: 30px; } .desktop-only { display: none; } .mobile-only { display: inline; } }
+      @media (max-width: 700px) { body { padding: 24px 19px 24px 23px; font-size: 20px; line-height: 1.67; letter-spacing: 0.009em; } main { width: 100%; } #statement, #bio, #contact { text-indent: 33px; } .desktop-only { display: none; } .mobile-only { display: inline; } }
     </style>
   </head>
   <body>
@@ -130,7 +131,7 @@
 
           if (state.typography) {
             words(view, '. Seeing it is an investigative tool for exploring form');
-            if (state.ellipsis) words(view, ', which shifts and adapts in response to each concept and project.');
+            if (state.ellipsis) words(view, ', which shifts and adapts in response to each project.');
             else view.append(expand('...', 'ellipsis'));
           } else {
             words(view, '.');
@@ -175,7 +176,7 @@
           else view.append(expand('in-house', 'inhouse'));
           words(view, ' graphic designer for ');
           if (state.inhouse) words(view, 'the design company ');
-          words(view, 'Maz\u014D.');
+          words(view, 'Mazo.');
         } else {
           words(view, '.');
         }
@@ -186,7 +187,7 @@
           words(view, ' Previously, he completed an internship at ');
           if (state.etypes) words(view, 'eTypes');
           else view.append(expand('eTypes', 'etypes'));
-          if (state.etypes) words(view, ', and worked for the newspaper Berlingske as a junior layout designer.');
+          if (state.etypes) words(view, ', and worked for the danish newspaper Berlingske as a junior layout designer.');
           else words(view, '.');
         }
 
